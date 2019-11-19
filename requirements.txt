@@ -1,0 +1,6 @@
+pycurl
+requests
+pymysql
+selenium
+BeautifulSoup4
+lxml
