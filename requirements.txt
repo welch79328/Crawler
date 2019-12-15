@@ -4,3 +4,4 @@ pymysql
 selenium
 BeautifulSoup4
 lxml
+flask
