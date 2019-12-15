@@ -15,7 +15,7 @@ class Curl():
 
 		if isinstance (data, str):
 			header = ['Content-Type: application/x-www-form-urlencoded']
-			data = urlencode({'messages': data + ' 偵測異常'})
+			data = urlencode({'messages': data})
 		elif isinstance (data, dict):
 			header = ['Content-Type: application/json']
 			data = json.dumps(data)

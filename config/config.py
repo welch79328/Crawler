@@ -12,14 +12,7 @@ from .models import (
 #------------Common Parameters---------------------------------------------
 DIRECTORY_PATH = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
-if platform.system() == 'Darwin':
-	sysytemOS = 'mac'
-elif platform.system() == 'Linux':
-	sysytemOS = 'linux'
-elif platform.system() == 'Windows':
-	sysytemOS = 'windows'
-
-CHROME_DRIVER_PATH = DIRECTORY_PATH + "/drivers/"+sysytemOS+"/chromedriver"
+CHROME_DRIVER_PATH = DIRECTORY_PATH + "/drivers/"+platform.system()+"/chromedriver"
 JSON_PATH = DIRECTORY_PATH + "/crawler/json/"
 
 SPORT_BASE_URL = "https://www.sportslottery.com.tw"
@@ -29,21 +22,22 @@ SPORT_ANNOUNCEMENT_URL = SPORT_BASE_URL+'/zh/web/guest/betting-announcement'
 
 #-------------------Curl-------------------------------------------------------
 
-CURL_LINEMESSAGE_URL = ''
-CURL_EC2START_URL = ''
-CURL_EC2STOP_URL = ''
+# CURL_LINEMESSAGE_URL = ''
+# CURL_EC2START_URL = ''
+# CURL_EC2STOP_URL = ''
+
+# curl = Curl()
 
 #-----------Import Class---------------------------------------------------
 DEFAULT_DRIVER = CHROME_DRIVER_PATH
 selenium = Selenium(DEFAULT_DRIVER)
 driver = selenium.openrBowser()
-curl = Curl()
 
 #-----------MySql----------------------------------------------------------
-DB_HOST = ''
-DB_DATABASE = ''
-DB_USERNAME = ''
-DB_PASSWORD = ''
+# DB_HOST = ''
+# DB_DATABASE = ''
+# DB_USERNAME = ''
+# DB_PASSWORD = ''
 
-dataBase = DataBase(DB_HOST, DB_USERNAME, DB_PASSWORD)
-dataBase.use_table(DB_DATABASE)
+# dataBase = DataBase(DB_HOST, DB_USERNAME, DB_PASSWORD)
+# dataBase.use_table(DB_DATABASE)
