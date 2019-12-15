@@ -134,12 +134,6 @@ class Selenium(userAgents):
 
 		data = re.sub(r'</?\w+[^>]*>','',self.driver.page_source)
 
-		elements = self.driver.find_elements_by_tag_name("strong")
-
-		for element in elements:
-			if element.text == '網站維護公告':
-				data = '[]'
-
 		return data
 
 

@@ -1,10 +1,6 @@
-import os
-import sys
 import time
-import random
+import json
 import requests
-import subprocess
-import datetime
 from config import config
 
 
@@ -16,56 +12,117 @@ class Base():
 	def _getTime(self):
 		return time.time()
 
-	def _getCurTime(self):
-		return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+		# 時間戳轉時間
+	def strtotime(self, timeData, length=False):
 
-	def _firstTenMinutes(self):
-		return (datetime.datetime.now()-datetime.timedelta(minutes=10)).strftime("%Y-%m-%d %H:%M")
+		if length:
+			timeData = int(str(timeData)[0:length])
 
-	def _getGeneralCalendar(self, day):
+		return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(timeData))
 
-		day = int(day.strftime("%Y%m%d"))
-		generalCalendar = str(day - 19110000)
+	def getPlayCode(self):
 
-		return generalCalendar
+		f = open(config.DIRECTORY_PATH +'/crawler/json/play_code.json', 'r')
+		playCode = json.loads(f.read())
+		f.close()
 
-	def _pingIP(self):
+		return playCode
 
-		try:
-			response = requests.get(config.SPORT_BASE_URL, timeout=10)
-		except:
-			return True
+	# 判斷是否有變數
+	def isset(self, dict, keys, errResult=''):
 
-			return False
+		for key in keys:
+			if type(key) == int:
+				dict = dict[key]
+			else:		
+				if key in dict.keys():
+					dict = dict[key]
+				else:
+					dict = errResult
+					break
+		return dict
 
-	def _ec2Process(self):
-		currentInstanceID = str(subprocess.check_output("wget -q -O - http://169.254.169.254/latest/meta-data/instance-id", shell=True), encoding = "utf-8")
+	# 取得現在節數
+	def NumberOfBoard(self, awayPeriod, homePeriod):
 
-		sql = "SELECT zone, category, country FROM ec2_list WHERE Instance_ID = '%s'" % \
-			(currentInstanceID)
-		config.dataBase.execution(sql)
-		result = config.dataBase.fetch('one')
+		index = 1
+		if awayPeriod:
+			for x in awayPeriod:
+				pass
 
-		currentRegion = result[0]
-		webCrawlerName = result[1]
-		currentcountry = result[2]
+		return 1
 
-		currentData = {'region':currentRegion, 'instanceID':currentInstanceID}
+	# 訂單顯示投注選項
+	def zhPeriod(type, period):
+		if type == 's-441':
+			if period == '1':
+				return '上半場'
+			else:
+				return '下半場'
 
-		responseResult = currentcountry + ':' + webCrawlerName
-		config.curl.post(config.CURL_LINEMESSAGE_URL, responseResult)
+		if type == 's-442':
+			return '不讓分[第 ' + period + ' 節]'
 
-		sql = "SELECT Instance_ID, zone FROM ec2_list WHERE category = '%s' AND Instance_ID != '%s'" % \
-			(webCrawlerName, currentInstanceID)
-		config.dataBase.execution(sql)
-		result = config.dataBase.fetch('all')
-		
-		backupMechanism = result[random.randint(0,len(result)-1)]
+		if type == 's-443':
+			return '不讓分[第 ' + period + ' 局]'
 
-		instanceID = backupMechanism[0]
-		region = backupMechanism[1]
-		data = {'region':region, 'instanceID':instanceID}
+		if type == 's-445':
+			return '不讓分[第 ' + period + ' 盤]'
 
-		config.curl.post(config.CURL_EC2START_URL, data)
-		config.curl.post(config.CURL_EC2STOP_URL, currentData)
+		if type == 's-650':
+			return '不讓分[第 ' + period + ' 局]'
+
+	def dealStringToZhtw(self, Option, awayteam, hometeam, awaySP='', homeSP=''):
+
+		if self.isset(homeSP, []):
+			homeSP = ' (' + homeSP + ')'
+
+		if self.isset(awaySP, []):
+			awaySP = ' (' + awaySP + ')'
+
+		if Option.find('*1*/*2*') >= 0:
+			Option = Option.replace('*1*/*2*', hometeam + homeSP + '/' + awayteam + awaySP)
+		elif Option.find('*2*/*1*') >= 0:
+			Option = Option.replace('*2*/*1*', awayteam + awaySP + '/' + hometeam + homeSP)
+		elif Option.find('*1*') >= 0:
+			Option = Option.replace('*1*', hometeam + homeSP)
+		elif Option.find('*2*') >= 0:
+			Option = Option.replace('*2*', awayteam + awaySP)
+		return Option
+
+
+	def outComeConditions(selection, OutcomeConditions):
+
+		if selection.find('_') > 0:
+			dealSelection = selection.split('_')
+			selectionCode = dealSelection[1]
+		else:
+			selectionCode = selection
+
+		if selectionCode == '446' or selectionCode == '448' or selectionCode == '449' or selectionCode == '450':
+			if OutcomeConditions > 0:
+				return '(-' + OutcomeConditions + ' +' + OutcomeConditions + ')'
+			else:
+				return '(+' + abs(OutcomeConditions) + ' -' + abs(OutcomeConditions) + ')'
+
+		if selectionCode == '447' and OutcomeConditions > 0:
+			return ' (' + (0 - OutcomeConditions) + ')'
+		elif selectionCode == '445' and OutcomeConditions > 0:
+			return ' (+' + abs(OutcomeConditions) + ')'
+		elif selectionCode == '447' and OutcomeConditions < 0:
+			return ' (+' + abs(OutcomeConditions) + ')'
+		elif selectionCode == '452' and OutcomeConditions > 0:
+			return ' (' + (0 - OutcomeConditions) + ')'
+		elif selectionCode == '451' and OutcomeConditions > 0:
+			return ' (+' + abs(OutcomeConditions) + ')'
+		elif selectionCode == '452' and OutcomeConditions < 0:
+			return ' (+' + abs(OutcomeConditions) + ')'
+		elif selectionCode == '456' and OutcomeConditions > 0:
+			return ' (' + (0 - OutcomeConditions) + ')'
+		elif selectionCode == '455' and OutcomeConditions > 0:
+			return ' (+' + abs(OutcomeConditions) + ')'
+		elif selectionCode == '456' and OutcomeConditions < 0:
+ 			return ' (+' + abs(OutcomeConditions) + ')'
+		else:
+			return ' (' + OutcomeConditions + ')'
 

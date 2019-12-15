@@ -10,11 +10,9 @@ class DataBase:
 
 		print(self.conn.open)
 
-
 	def use_table(self, tableName):
 
 		self.cur.execute("USE "+tableName)
-
 
 
 	def execution(self, sql):
@@ -43,9 +41,13 @@ class DataBase:
 	def fetch(self, fetch):
 
 		if fetch == 'one':
-			return self.cur.fetchone()
+			return self.getAlone(self.cur.fetchone())
 		else:
 			return self.cur.fetchall()
 
+	def getAlone(self, fetchdata):
 
+		if len(fetchdata) == 1:
+			fetchdata = fetchdata[0]
 
+		return fetchdata

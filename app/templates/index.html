@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block body %}
+{% if contrast %}
+	<section id="top">
+		<section id="contant" class="contant main-heading team">
+	     <div class="row">
+	        <div class="container">
+	        	{% for key in sport %}
+		           	<div class="col-md-3 column">
+		              	<div class="card">
+		                 	<div class="">
+		                    	<h4><a href="{{ url }}{{ key[0:1] }}={{ key }}"> {{ contrast[key] }} </a></h4>
+		                 	</div>
+		              	</div>
+		           </div>
+	           {% endfor %}
+	        </div>
+	     </div>
+	  </section>
+	</section>
+{% else %}
+	<section id="contant" class="contant">
+		<div class="container">
+			<h4>開賽時間: {{ sport['gameTime'] }}</h4>
+			<aside id="sidebar" class="left-bar">
+			 	<div class="feature-matchs">
+			    	<div class="team-btw-match">
+			       		<ul>
+			          		<li class="vs"><span>{{ sport['homeTeam'] }}</span></li>
+			          		<li class="vs"><span>vs</span></li>
+			          		<li class="vs"><span>{{ sport['awayTeam'] }}</span></li>
+			       		</ul>
+			    	</div>
+			 	</div>
+			</aside>
+			{% for play in sport['playCode'] %}
+				<h4>{{ play['title'] }}</h4>
+				<aside id="sidebar" class="left-bar">
+				 	<div class="feature-matchs">
+				    	<table class="table table-bordered table-hover">
+				       		<tbody>
+			       			{% for code in play['codes'] %}
+				          		<tr>
+				             		<td style="width: 50%;">{{ code['name'] }}</td>
+				             		<td style="width: 50%;">{{ code['odds'] }}</td>
+				          		</tr>
+			          		{% endfor %}
+				       		</tbody>
+				    	</table>
+					</div>
+				</aside>
+			{% endfor %}
+		</div>
+	</section>
+{% endif %}
+
+{% endblock %}
