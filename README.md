@@ -23,9 +23,3 @@ python execution.py
 ```
 python app/__init__.py
 ```
-
-## 展示
-
-```
-http://52.68.189.139/
-```
